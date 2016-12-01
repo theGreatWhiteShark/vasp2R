@@ -5,6 +5,7 @@
 ##' @param path Character vector containing the path to the CHGCAR file. (As for now you MUST to include in the name of the file at the end of 'path' and it MUST contain the letters 'CHG' if the format is according to the CHG file produced by VASP or 'CHGCAR' if according to the CHGCAR file)
 ##'
 ##' @family vasp
+##' @export
 ##' 
 ##' @return List of three named data.frames:
 ##' \itemize{
