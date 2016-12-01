@@ -8,16 +8,24 @@ Authors@R: person("Philipp","Developer", role = c("aut","cre"),
 	   email = "thetruephil@googlemail.com")
 Author: Philipp Mueller
 Maintainer: Philipp Mueller <thetruephil@googlemail.com>
-Description: The basic function of this package is to parse the CHGCAR file of a VASP calculation and provide a list of three data.frames to the user: one contains the cartesian coordinates of the atoms in the cell with their individual atom type as a factor, another contains the coordinates and the corresponding charge at each position of the calculated grid and the last constains the lattice vectors of the cell. In addition some functions to ease the manipulation of the data for plotting  e.g. rotating an object or extracting a specific plane in a volume) are provided.
+Description: The basic function of this package is to parse the CHGCAR file
+    of a VASP calculation and provide a list of three data.frames to the user:
+    one contains the cartesian coordinates of the atoms in the cell with their
+    individual atom type as a factor, another contains the coordinates and the
+    corresponding charge at each position of the calculated grid and the last
+    constains the lattice vectors of the cell. In addition some functions to ease
+    the manipulation of the data for plotting e.g. rotating an object or extracting
+    a specific plane in a volume) are provided.
 URL: https://github.com/theGreatWhiteShark/vasp2R
 Depends:
-	R(>= 3.0.1)
+    R(>= 3.0.1)
 Imports:
-	Rcpp,
-	readr,
+    Rcpp,
+    readr,
 License: GPL-3
 Suggests:
-	ggplot2,
-	knitr
+    ggplot2,
+    knitr
 LinkingTo: Rcpp
 VignetteBuilder: knitr
+RoxygenNote: 5.0.1
