@@ -1,13 +1,13 @@
-##' @title vasp.rotate.cell
-##' @description Rotates the content of a cell with a specific angle.
+##' @title Rotates the content of a cell by a specific angle.
 ##'
-##' @details In this version of the function only a rotation in the x-y plane is possible. The supplied content of the cell has to consist of named columns "x" and "y" for the Cartesian coordinates. If no angle is provided the angle between the two lattice vectors is determined and the content will be shifted by half of this angle in the positive direction. A rotation matrix is applied to all the coordinates in the cell using a cpp loop. Generic function working with both the specific content of the cell, like the atom positions, and an object of class "vasp".
+##' @details In the current version of this function only a rotation in the x-y plane is possible. If no angle is provided the angle between the two lattice vectors is determined and the content will be shifted clockwise by half of its value. Internally a rotation matrix is applied to all the coordinates in the cell. It is intended to be a generic function working with both the specific content of the cell, like the atom positions, and an object of class "vasp".
 ##'
-##' @param cell Data frame containing at least two named columns "x" and "y" containing Cartesian coordinates or an object of class "vasp".
-##' @param lattice Data frame of dimension 3x3 containing the three lattice vectors in separate rows and their coordinates in different columns. See \code{\link{vasp.import}}. If cell is an object of class "vasp" this argument can is omitted.
-##' @param angle Specifies the angle with which the cell is going to be rotated. If no value is supplied the angle between the two lattice vectors is determined and the content will be shifted by half of this angle in the positive direction.
+##' @param cell A data.frame containing at least two named columns "x" and "y" with Cartesian coordinates or an object of class "vasp".
+##' @param lattice A data.frame of dimension 3x3 containing the lattice vectors in its rows and their coordinates in its columns. See \code{\link{vasp.import}}. If the argument 'cell' is an object of class "vasp" 'lattice' can is omitted.
+##' @param angle Specifies the angle with which the cell is going to be rotated. If no value is supplied the angle between the two lattice vectors is determined and the content will be shifted clockwise by half of its value.
 ##' 
 ##' @family vasp
+##' @export
 ##' @seealso \code{\link{vasp.import}}
 ##' @return Same object like the input "cell" but with modified coordinates.
 ##' @author Philipp Mueller
@@ -17,7 +17,6 @@ vasp.rotate.cell <- function( cell, lattice = NULL, angle = NULL ){
 vasp.rotate.cell.vasp <- function( cell, lattice = NULL, angle = NULL ){
     atoms.new <- vasp.rotate.cell.default( cell$atoms, cell$lattice, angle )
     charge.new <- vasp.rotate.cell.default( cell$charge, cell$lattice, angle )
-
     cell.new <- list( atoms = atoms.new, charge = charge.new, lattice = cell$lattice )
     class( cell.new ) <- c( "vasp", "data.frame" )
     return( cell.new )
@@ -34,42 +33,23 @@ vasp.rotate.cell.default <- function( cell, lattice = NULL, angle = NULL ){
                                sqrt( lattice[ 2, 1 ]^2 + lattice[ 2, 2 ]^2 ) ) )
         angle <- -angle/ 2
     }
-    
-    rotate.cell <- inline::cxxfunction( signature( cell = "numeric",
-                                     angle = "double" ),
-                          plugin = "Rcpp", body = '
-Rcpp::DataFrame cellDataFrame(cell);
-Rcpp::NumericVector xOld = cellDataFrame[ "x" ];
-Rcpp::NumericVector yOld = cellDataFrame[ "y" ];
-Rcpp::NumericVector xNew(xOld.size());
-Rcpp::NumericVector yNew(yOld.size());
-double phi = Rcpp::as<double>(angle);
-
-for (int ii=0; ii<xOld.size(); ii++){
-   xNew[ii] = xOld[ii]* cos(phi) - yOld[ii]* sin(phi);
-   yNew[ii] = xOld[ii]* sin(phi) + yOld[ii]* cos(phi);
-}
-
-return Rcpp::DataFrame::create(Rcpp::Named("x")=xNew,
-                               Rcpp::Named("y")=yNew);')
-                              
-    plane.new <- rotate.cell( cell, angle )
+    plane.new <- .Call( "rotateCell", PACKAGE = "vasp2R", cell, angle )
     cell$x <- plane.new$x
     cell$y <- plane.new$y
     return( cell )
 }
 
 
-##' @title vasp.bonds
-##' @description Generates a data frame containing the start and the endpoints of all bounds in the system.
+##' @title Generates a data.frame containing the start- and the endpoints of all bounds in the system.
 ##'
-##' @details Two atoms share a bond if they a closer than a specified distance. Since this function was originally written for a layered system the bonds are only created within one type of atoms. But its quite easily extendible to bonds between several kinds of atoms. Also compatible with object of class "vasp".
+##' @details Two atoms share a bond if they a closer than a specified minimum distance. Since this function was originally written for a layered system the bonds are only created within one type of atoms. But it is quite easily extendable to bonds between several kinds of atoms.
 ##'
-##' @param atoms Data frame containing the x, y and z position of the atoms in cartesian coordinates as named columns and a fourth column names "type" containing a character specifying the atom species. See \code{\link{vasp.import}}$atoms.
-##' @param distance Vector of length unique( atoms$type ) containing the bonding distances between the individual atoms. To establish a bond two atoms must be closer than this value. The order in this distances vector has to be the same as in unique( atoms$type ).
+##' @param atoms A data.frame containing the x, y and z position of the atoms in Cartesian coordinates as named columns and a fourth column names "type" containing a character specifying the atom species or an object of class "vasp". See \code{\link{vasp.import}}$atoms.
+##' @param distance Vector of length unique( atoms$type ) containing the bonding distances between the individual atoms. To establish a bond two atoms must be closer together than this value. The order in this distances vector has to be the same as in unique( atoms$type ).
 ##'
-##' @return Data frame with seven named columns "x.begin", "y.begin", "z.begin", "x.end", "y.end", "z.end" and "type" containing the start and end points of the bonds in the system as well as the type of atoms between which the bond is established. The later is necessary for the correct coloring and can be easily extended to bonds of many different atom types.
+##' @return A data.frame with seven named columns "x.begin", "y.begin", "z.begin", "x.end", "y.end", "z.end" and "type" containing the start- and endpoints of the bonds in the system as well as the type of atoms between which the bond is established. The later is necessary for the correct coloring and can be easily extended to bonds of many different atom types.
 ##' @family vasp
+##' @export
 ##' @author Philipp Mueller
 vasp.bonds <- function( atoms, distance ){
     if ( any( class( atoms ) == "vasp" ) )
@@ -117,30 +97,30 @@ vasp.bonds <- function( atoms, distance ){
     return( bond.final )
 }
 
-##' @title reproduce
-##' @description Reproduce the content of a unit cell in multiple direction of its lattice vectors.
+##' @title  Reproduce the content of a unit cell in multiple direction of its lattice vectors.
 ##'
-##' @details The number of reproductions has to be provided as a sequence. E.g. seq(-3,3). Generic function working with both the specific content of the x, like the atom positions, and an object of class "vasp". 
+##' @details The number of reproductions has to be provided as a numerical vector (e.g. seq(-3,3)). Generic function working with both the specific content of the x, like the atom positions, and an object of class "vasp". 
 ##'
-##' @param x Data frame containing at least two named columns "x" and "y" containing Cartesian coordinates or an object of class "vasp" to reproduce its atom positions and charge in one step.
-##' @param lattice Data frame of dimension 3x3 containing the three lattice vectors in separate rows and their coordinates in different columns. See \code{\link{vasp.import}}. If an object of class "vasp" was supplied in x this argument is omitted.
-##' @param x.rep Number of reproductions of the first lattice vector of the unit cell given in a sequence. 
-##' @param y.rep Number of reproductions of the second lattice vector of the unit cell given in a sequence.
-##' @param z.rep Number of reproductions of the third lattice vector of the unit cell given in a sequence.
+##' @param x A data.frame containing at least two named columns "x" and "y" containing Cartesian coordinates or an object of class "vasp" to reproduce its atom positions and charge in one step.
+##' @param lattice A data.frame of dimension 3x3 containing the three lattice vectors in separate rows and their coordinates in different columns. See \code{\link{vasp.import}}. If an object of class "vasp" was supplied in the 'x' argument 'lattice' can be omitted.
+##' @param x.rep Number of reproductions along the first lattice vector of the unit cell given in a sequence. 
+##' @param y.rep Number of reproductions along the second lattice vector of the unit cell given in a sequence.
+##' @param z.rep Number of reproductions along the third lattice vector of the unit cell given in a sequence.
 ##'
 ##' @family vasp
+##' @export
 ##' @return Input 'x' extended by the additional content of the reproduced unit cell.
 ##' @author Philipp Mueller
-reproduce <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.rep = NULL, x.window = NULL, y.window = NULL, z.window = NULL ){
+vasp.reproduce <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.rep = NULL, x.window = NULL, y.window = NULL, z.window = NULL ){
     UseMethod( "reproduce" )
 }
-reproduce.vasp <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.rep = NULL, x.window = NULL, y.window = NULL, z.window = NULL ){
+vasp.reproduce.vasp <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.rep = NULL, x.window = NULL, y.window = NULL, z.window = NULL ){
     x$atoms <- reproduce.default( x$atoms, x$lattice, x.rep, y.rep, z.rep, x.window, y.window, z.window )
     x$charge <- reproduce.default( x$charge, x$lattice, x.rep, y.rep, z.rep, x.window, y.window, z.window )
     class( x ) <- c( "vasp", "data.frame" )
     return( x )
 }    
-reproduce.default <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.rep = NULL, x.window = NULL, y.window = NULL, z.window = NULL ){
+vasp.reproduce.default <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.rep = NULL, x.window = NULL, y.window = NULL, z.window = NULL ){
     if ( is.null( x$x ) || is.null( x$y ) || is.null( x$z ) )
         stop( "vasp.reproduce.default: A data frame containing named columns 'x', 'y' and 'z' has to be provided in bonds." )
     if ( is.null( lattice ) )
@@ -205,19 +185,19 @@ reproduce.default <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.
     return( output )
 }
 
-##' @title diff.vasp
-##' @description Calculates the charge difference of two charge densities.
+##' @title Calculates the difference of two charge densities.
 ##'
-##' @details Additional method for the S3 generic base::diff. Only the charge of the second input is subtracted from the charge of the first input.
+##' @details The charge of the second input is subtracted from the one of the first input.
 ##'
-##' @param x First object of class "vasp". Its used as the reference.
+##' @param x First object of class "vasp". It is used as the reference.
 ##' @param y Second object of class "vasp".
 ##'
 ##' @family vasp
+##' @export
 ##'
 ##' @return Input x with different values in the 'charge' element.
 ##' @author Philipp Mueller
-diff.vasp <- function( x, y ){
+vasp.diff <- function( x, y ){
     ## The restriction in the z grid of plot.charge.calc is removed.
     diff <- x
     diff$charge$charge <- x$charge$charge - y$charge$charge
@@ -229,19 +209,19 @@ diff.vasp <- function( x, y ){
 plane <- function( x, height = mean( x$atoms[ x$atoms$type == unique( x$atoms$type )[ 1 ], ]$z, ... ) ){
     UseMethod( "plane" )
 }
-##' @title plane.vasp
-##' @description Extracts a plane of charge rectangle to the z axis.
+##' @title Extracts a plane of charge orthogonal to the z axis.
 ##'
-##' @details Method of a S3 generic. The element containing all details about the atom positions is just copied to the output. Only the charge density is sliced.
+##' @details Only the charge density is sliced.
 ##'
-##' @param x Provided VASP result of class "vasp".
-##' @param height Position on the z axis at which the slice through the charge density is going to be extracted. The default value is the mean z value of all atoms of the first type listed in x$atoms$type.
+##' @param x Object result of class "vasp".
+##' @param height Position on the z axis at which the slice through the charge density is going to be performed. The default value is the mean z value of all atoms of the first type listed in x$atoms$type (since the package was originally intended for layered materials).
 ##'
 ##' @family vasp
+##' @export
 ##'
 ##' @return Object of class vasp containing just one z plane in its $charge element.
 ##' @author Philipp Mueller
-plane.vasp <- function( x, height = mean( x$atoms[ x$atoms$type == unique( x$atoms$type )[ 1 ], ]$z ) ){
+vasp.plane <- function( x, height = mean( x$atoms[ x$atoms$type == unique( x$atoms$type )[ 1 ], ]$z ) ){
     ## Plotting the electron density at the z grid nearest to the Graphene layer.
     ## Where x is the latter one and y is the reference
     plot.height <- which( abs( unique( x$charge$z ) - height ) == 
@@ -251,3 +231,15 @@ plane.vasp <- function( x, height = mean( x$atoms[ x$atoms$type == unique( x$ato
     class( output ) <- c( "vasp", "data.frame" )
     return( output )
 }
+
+##' Output of the \code{\link{vasp.import}} function applied on the CHGCAR file of a single silicium atom in a fcc cell.
+##'
+##' @format Data frame containing four columns
+##' \itemize{
+##'   \item{ charge: Consists of four columns: "x", "y", "z" containing the Cartesian coordinates to a grid point and "charge" containing the charge density on this specific grid point.}
+##'   \item{ atoms: Consists of four columns: "x", "y", "z" containing the Cartesian coordinates to the atoms within the cell and "type" providing a factor to distinguish the individual types of atoms.}
+##'   \item{ lattice:  Consists of three columns: "x", "y", "z" containing the components of the three lattice vectors of the unit cell.}
+##' }
+##'
+##' @name SiChgcar
+NULL
