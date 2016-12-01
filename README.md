@@ -5,7 +5,7 @@ Okay, I wrote the code in the beginning of 2015 right when I started to learn R 
 
 And another note: I do neither work with VASP anymore nor do I have access to the program. I will try to help you in case of bugs, issues or questions but it will be more or less limited to the R issues.
 
-[example picture](./res/example.png)
+![example picture](./res/example.png)
 
 # Todo
 
