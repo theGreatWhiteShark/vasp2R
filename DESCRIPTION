@@ -8,7 +8,7 @@ Authors@R: person("Philipp","Developer", role = c("aut","cre"),
 	   email = "thetruephil@googlemail.com")
 Author: Philipp Mueller
 Maintainer: Philipp Mueller <thetruephil@googlemail.com>
-Description: The basic function of this package is to parse the CHGCAR file
+Description: The basic function of this package is to parse the CHGCAR or CHG file
     of a VASP calculation and provide a list of three data.frames to the user:
     one contains the cartesian coordinates of the atoms in the cell with their
     individual atom type as a factor, another contains the coordinates and the
@@ -25,7 +25,8 @@ Imports:
 License: GPL-3
 Suggests:
     ggplot2,
-    knitr
+    knitr,
+    rmarkdown
 LinkingTo: Rcpp
 VignetteBuilder: knitr
 RoxygenNote: 5.0.1
