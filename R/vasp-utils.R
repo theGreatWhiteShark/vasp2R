@@ -19,7 +19,7 @@ vasp.rotate.cell.vasp <- function( cell, lattice = NULL, angle = NULL ){
     atoms.new <- vasp.rotate.cell.default( cell$atoms, cell$lattice, angle )
     charge.new <- vasp.rotate.cell.default( cell$charge, cell$lattice, angle )
     cell.new <- list( atoms = atoms.new, charge = charge.new, lattice = cell$lattice )
-    class( cell.new ) <- c( "vasp", "data.frame" )
+    class( cell.new ) <- "vasp"
     return( cell.new )
 }
 ##' @export
@@ -54,7 +54,7 @@ vasp.rotate.cell.default <- function( cell, lattice = NULL, angle = NULL ){
 ##' @export
 ##' @author Philipp Mueller
 vasp.bonds <- function( atoms, distance ){
-    if ( any( class( atoms ) == "vasp" ) )
+    if ( class( atoms ) == "vasp" )
         atoms <- atoms$atoms
     if ( is.null( atoms$x ) || is.null( atoms$y ) || is.null( atoms$z ) )
         stop( "vasp.bonds: A data frame containing named columns 'x', 'y' and 'z' has to be provided in bonds." )
@@ -120,7 +120,7 @@ vasp.reproduce <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.rep
 vasp.reproduce.vasp <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.rep = NULL, x.window = NULL, y.window = NULL, z.window = NULL ){
     x$atoms <- vasp.reproduce.default( x$atoms, x$lattice, x.rep, y.rep, z.rep, x.window, y.window, z.window )
     x$charge <- vasp.reproduce.default( x$charge, x$lattice, x.rep, y.rep, z.rep, x.window, y.window, z.window )
-    class( x ) <- c( "vasp", "data.frame" )
+    class( x ) <- "vasp"
     return( x )
 }    
 ##' @export
@@ -206,7 +206,7 @@ vasp.diff <- function( x, y ){
     diff <- x
     diff$charge$charge <- x$charge$charge - y$charge$charge
     output <- list( charge = diff$charge, atoms = x$atoms, lattice = x$lattice )
-    class( output ) <- c( "vasp", "list" )
+    class( output ) <- "vasp"
     return( output )
 }
 
@@ -229,6 +229,6 @@ vasp.plane <- function( x, height = mean( x$atoms[ x$atoms$type == unique( x$ato
                              min( abs( unique( x$charge$z ) - height ) ) )
     plot.data.diff <-  x$charge[ x$charge[ "z" ] == unique( x$charge$z )[ plot.height ], ]
     output <- list( charge = plot.data.diff, atoms = x$atoms )
-    class( output ) <- c( "vasp", "data.frame" )
+    class( output ) <- "vasp"
     return( output )
 }

@@ -125,7 +125,7 @@ vasp.import <- function( path ){
         }
     }
     output <- list( charge = charge.df, atoms = atoms.positions, lattice = lattice.vectors )
-    class( output ) <- c( "vasp", "list" )
+    class( output ) <- "vasp"
     
     return( output )
 }
