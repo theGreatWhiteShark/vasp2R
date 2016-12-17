@@ -14,6 +14,7 @@
 vasp.rotate.cell <- function( cell, lattice = NULL, angle = NULL ){
     UseMethod( "vasp.rotate.cell" )
 }
+##' @export
 vasp.rotate.cell.vasp <- function( cell, lattice = NULL, angle = NULL ){
     atoms.new <- vasp.rotate.cell.default( cell$atoms, cell$lattice, angle )
     charge.new <- vasp.rotate.cell.default( cell$charge, cell$lattice, angle )
@@ -21,6 +22,7 @@ vasp.rotate.cell.vasp <- function( cell, lattice = NULL, angle = NULL ){
     class( cell.new ) <- c( "vasp", "data.frame" )
     return( cell.new )
 }
+##' @export
 vasp.rotate.cell.default <- function( cell, lattice = NULL, angle = NULL ){
     if ( is.null( cell$x ) || is.null( cell$y ) )
         stop( "vasp.rotate.cell.default: supplied cell must have at least two named columns containing the x and y coordinates" )
@@ -112,14 +114,16 @@ vasp.bonds <- function( atoms, distance ){
 ##' @return Input 'x' extended by the additional content of the reproduced unit cell.
 ##' @author Philipp Mueller
 vasp.reproduce <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.rep = NULL, x.window = NULL, y.window = NULL, z.window = NULL ){
-    UseMethod( "vasp.reproduce" )
+    UseMethod( "vasp.reproduce", x )
 }
+##' @export
 vasp.reproduce.vasp <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.rep = NULL, x.window = NULL, y.window = NULL, z.window = NULL ){
     x$atoms <- vasp.reproduce.default( x$atoms, x$lattice, x.rep, y.rep, z.rep, x.window, y.window, z.window )
     x$charge <- vasp.reproduce.default( x$charge, x$lattice, x.rep, y.rep, z.rep, x.window, y.window, z.window )
     class( x ) <- c( "vasp", "data.frame" )
     return( x )
 }    
+##' @export
 vasp.reproduce.default <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.rep = NULL, x.window = NULL, y.window = NULL, z.window = NULL ){
     if ( is.null( x$x ) || is.null( x$y ) || is.null( x$z ) )
         stop( "vasp.reproduce.default: A data frame containing named columns 'x', 'y' and 'z' has to be provided in bonds." )
