@@ -46,40 +46,48 @@ vasp.rotate.cell.default <- function( cell, lattice = NULL, angle = NULL ){
 ##'
 ##' @details Two atoms share a bond if they a closer than a specified minimum distance. Since this function was originally written for a layered system the bonds are only created within one type of atoms. But it is quite easily extendable to bonds between several kinds of atoms.
 ##'
-##' @param atoms A data.frame containing the x, y and z position of the atoms in Cartesian coordinates as named columns and a fourth column names "type" containing a character specifying the atom species or an object of class "vasp". See \code{\link{vasp.import}}$atoms.
+##' @param x A data.frame containing the x, y and z position of the atoms in Cartesian coordinates as named columns and a fourth column names "type" containing a character specifying the atom species or an object of class "vasp". See \code{\link{vasp.import}}$atoms.
 ##' @param distance Vector of length unique( atoms$type ) containing the bonding distances between the individual atoms. To establish a bond two atoms must be closer together than this value. The order in this distances vector has to be the same as in unique( atoms$type ).
 ##'
 ##' @return A data.frame with seven named columns "x.begin", "y.begin", "z.begin", "x.end", "y.end", "z.end" and "type" containing the start- and endpoints of the bonds in the system as well as the type of atoms between which the bond is established. The later is necessary for the correct coloring and can be easily extended to bonds of many different atom types.
 ##' @family vasp
 ##' @export
 ##' @author Philipp Mueller
-vasp.bonds <- function( atoms, distance ){
-    if ( class( atoms ) == "vasp" )
-        atoms <- atoms$atoms
-    if ( is.null( atoms$x ) || is.null( atoms$y ) || is.null( atoms$z ) )
+vasp.bonds <- function( x, distance ){
+    UseMethod( "vasp.bonds", x )
+}
+##' @export
+vasp.bonds.vasp <- function( x, distance ){
+    x.bonds <- vasp.bonds.default( x$atoms, distance )
+    x$bonds <- x.bonds
+    return( x )
+}
+##' @export
+vasp.bonds.default <- function( x, distance ){
+    if ( is.null( x$x ) || is.null( x$y ) || is.null( x$z ) )
         stop( "vasp.bonds: A data frame containing named columns 'x', 'y' and 'z' has to be provided in bonds." )
-    if ( length( unique( atoms$type ) ) != length( distance ) )
+    if ( length( unique( x$type ) ) != length( distance ) )
         stop( "vasp.bonds: The number of bonding distance thresholds in bonds has to be of the same length than the number of types in the supplied data frame." )
 
-    bond <- data.frame( x.begin = rep( -999, nrow( atoms )* 5 ),
-                       y.begin = rep( -999, nrow( atoms )* 5 ),
-                       z.begin = rep( -999, nrow( atoms )* 5 ),
-                       x.end = rep( -999, nrow( atoms )* 5 ),
-                       y.end = rep( -999, nrow( atoms )* 5 ),
-                       z.end = rep( -999, nrow( atoms )* 5 ),
-                       type = rep( "bla", nrow( atoms )* 5 ),
+    bond <- data.frame( x.begin = rep( -999, nrow( x )* 5 ),
+                       y.begin = rep( -999, nrow( x )* 5 ),
+                       z.begin = rep( -999, nrow( x )* 5 ),
+                       x.end = rep( -999, nrow( x )* 5 ),
+                       y.end = rep( -999, nrow( x )* 5 ),
+                       z.end = rep( -999, nrow( x )* 5 ),
+                       type = rep( "bla", nrow( x )* 5 ),
                        stringsAsFactors = FALSE )
     bond.count <- 1
     bond.type.count <- 0
-    for ( tt in unique( atoms$type ) ){
-        pos <- atoms[ atoms$type == tt, ]
+    for ( tt in unique( x$type ) ){
+        pos <- x[ x$type == tt, ]
 
         for ( ii in 1 : ( nrow( pos ) - 1 ) ){
             for ( jj in ( ii + 1 ) : nrow( pos ) ){
                 if ( ( ( pos$x[[ ii ]] - pos$x[[ jj ]] )^2 +
                        ( pos$y[[ ii ]] - pos$y[[ jj ]] )^2 +
                        ( pos$z[[ ii ]] - pos$z[[ jj ]] )^2  ) <=
-                    distance[ which( unique( atoms$type == tt ) ) ] ){
+                    distance[ which( unique( x$type == tt ) ) ] ){
                     bond$x.begin[[ bond.count ]] <- pos$x[[ ii ]]
                     bond$y.begin[[ bond.count ]] <- pos$y[[ ii ]]
                     bond$z.begin[[ bond.count ]] <- pos$z[[ ii ]]

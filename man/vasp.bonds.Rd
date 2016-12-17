@@ -4,10 +4,10 @@
 \alias{vasp.bonds}
 \title{Generates a data.frame containing the start- and the endpoints of all bounds in the system.}
 \usage{
-vasp.bonds(atoms, distance)
+vasp.bonds(x, distance)
 }
 \arguments{
-\item{atoms}{A data.frame containing the x, y and z position of the atoms in Cartesian coordinates as named columns and a fourth column names "type" containing a character specifying the atom species or an object of class "vasp". See \code{\link{vasp.import}}$atoms.}
+\item{x}{A data.frame containing the x, y and z position of the atoms in Cartesian coordinates as named columns and a fourth column names "type" containing a character specifying the atom species or an object of class "vasp". See \code{\link{vasp.import}}$atoms.}
 
 \item{distance}{Vector of length unique( atoms$type ) containing the bonding distances between the individual atoms. To establish a bond two atoms must be closer together than this value. The order in this distances vector has to be the same as in unique( atoms$type ).}
 }
