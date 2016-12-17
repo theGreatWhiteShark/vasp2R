@@ -206,9 +206,6 @@ vasp.diff <- function( x, y ){
     return( output )
 }
 
-plane <- function( x, height = mean( x$atoms[ x$atoms$type == unique( x$atoms$type )[ 1 ], ]$z, ... ) ){
-    UseMethod( "plane" )
-}
 ##' @title Extracts a plane of charge orthogonal to the z axis.
 ##'
 ##' @details Only the charge density is sliced.
