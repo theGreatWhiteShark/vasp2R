@@ -2,6 +2,8 @@
 
 S3method(vasp.reproduce,default)
 S3method(vasp.reproduce,vasp)
+S3method(vasp.rotate.cell,default)
+S3method(vasp.rotate.cell,vasp)
 export(vasp.bonds)
 export(vasp.diff)
 export(vasp.import)
