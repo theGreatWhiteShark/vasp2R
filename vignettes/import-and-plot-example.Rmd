@@ -1,0 +1,43 @@
+---
+title: "Vignette Title"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+# About
+This vignette shows the basic usage of the **vasp2R** package. First we will import an example CHG file, do some manipulation and finally plot the result of the VASP calculation. 
+
+The VASP files used to create the CHG file supplied by this package are taken from the [third Hands-on example of VASP's documentation](https://www.vasp.at/vasp-workshop/slides/Handson3.tgz). I used the first one: the clean Ni surface. Why did I used the CHG and not the CHGCAR? Because it also contains the required information but is smaller in size and I want to keep package's size at a minimum.
+
+# Import
+First of all you have to be sure of have the **vasp2R** package installed.
+```{r, cache = TRUE }
+check.validity <- try( library( "vasp2R" ), silent = TRUE )
+if ( class( check.validity ) == "try-error" ){
+    ## the package is not installed yet
+    devtools::install_github( "theGreatWhiteShark/vasp2R" )
+    library( vasp2R )
+}
+```
+
+During installation the CHG files is copied as one of the package's assets on the hard disk. We will import it into R using the *vasp.import* function.
+
+```{r, cache = TRUE}
+
+imported.data <- vasp.import( system.file( "example/CHG",
+                                          package = "vasp2R" ) )
+```
+
+# Manipulation and visualization
+
+Afterwards we will reproduce the imported VASP results of a single Ni atom with periodic boundary conditions to make it actually look like a surface
+
+
+Then we establish bonds between the individual atoms (for a better visualization of the results).
+
+
+As a final step we can rotate the positions to change our point of view. For such a clean and symmetric surface this is a little bit useless. But for more complex structures it will become quite handy.
