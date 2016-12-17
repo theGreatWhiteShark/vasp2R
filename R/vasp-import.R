@@ -6,6 +6,7 @@
 ##'
 ##' @family vasp
 ##' @export
+##' @useDynLib vasp2R
 ##' 
 ##' @return List of three named data.frames:
 ##' \itemize{
