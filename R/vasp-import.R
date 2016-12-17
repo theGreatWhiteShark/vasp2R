@@ -33,31 +33,32 @@ vasp.import <- function( path ){
 
     ## Determining the number of lines which span the entries of the charge density
     charge.entries <- lattice.grid[[ 1 ]]* lattice.grid[[ 2 ]]* lattice.grid[[ 3 ]]
-    if ( grep( "CHGCAR", path ) ){
+    if ( grep( "CHG", path ) ){
+        ## CHG was supplied
+        charge.lines <- charge.entries/ 10
+    } else {
         ## CHGCAR was supplied
         charge.lines <- charge.entries/ 5
-    } else {
-        charge.lines <- charge.entries/ 10
     }
 
     ## Import the raw format of the charge grid.
     charge.raw <- readr::read_table( path, skip = ( 10 + sum( lattice.numbers ) ),
                                     n_max= charge.lines, col_names = FALSE,
                                     progress = FALSE )/ lattice.volume
-    if ( grep( "CHGCAR", path ) ){
-        names( charge.raw ) <- c( "V1", "V2", "V3", "V4", "V5" )
-    } else {
+    if ( grep( "CHG", path ) ){
         ## This ensures the functionality of the function even when the CHG file is provided.
         names( charge.raw ) <- c( "V1", "V2", "V3", "V4", "V5", "V6", "V7", "V8", "V9", "V10" )
+    } else {
+        names( charge.raw ) <- c( "V1", "V2", "V3", "V4", "V5" )
     }
     ## The main difference between the CHGCAR and the CHG file is the format. The charge density is stored with higher precision in the CHGCAR and with 5 columns per row. The CHG contains 10 columns per row.
     ## After this step there is just one format regardless of the input file.
     ## The rows of the charge density will be concatenated one by one. So A[a,b;c,d] becomes V[a,b,c,d]. 
-    if ( grep( "CHGCAR", path ) ){
-        charge.vector <- .Call( "importCHGCAR", PACKAGE = "vasp2R",
+    if ( grep( "CHG", path ) ){
+        charge.vector <- .Call( "importCHG", PACKAGE = "vasp2R",
                                charge.raw )
     } else
-        charge.vector <- .Call( "importCHG", PACKAGE = "vasp2R",
+        charge.vector <- .Call( "importCHGCAR", PACKAGE = "vasp2R",
                                charge.raw )
 
     ## Reformatting the charge density
