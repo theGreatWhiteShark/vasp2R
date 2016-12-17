@@ -112,11 +112,11 @@ vasp.bonds <- function( atoms, distance ){
 ##' @return Input 'x' extended by the additional content of the reproduced unit cell.
 ##' @author Philipp Mueller
 vasp.reproduce <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.rep = NULL, x.window = NULL, y.window = NULL, z.window = NULL ){
-    UseMethod( "reproduce" )
+    UseMethod( "vasp.reproduce" )
 }
 vasp.reproduce.vasp <- function( x, lattice = NULL, x.rep = NULL, y.rep = NULL, z.rep = NULL, x.window = NULL, y.window = NULL, z.window = NULL ){
-    x$atoms <- reproduce.default( x$atoms, x$lattice, x.rep, y.rep, z.rep, x.window, y.window, z.window )
-    x$charge <- reproduce.default( x$charge, x$lattice, x.rep, y.rep, z.rep, x.window, y.window, z.window )
+    x$atoms <- vasp.reproduce.default( x$atoms, x$lattice, x.rep, y.rep, z.rep, x.window, y.window, z.window )
+    x$charge <- vasp.reproduce.default( x$charge, x$lattice, x.rep, y.rep, z.rep, x.window, y.window, z.window )
     class( x ) <- c( "vasp", "data.frame" )
     return( x )
 }    
@@ -231,15 +231,3 @@ vasp.plane <- function( x, height = mean( x$atoms[ x$atoms$type == unique( x$ato
     class( output ) <- c( "vasp", "data.frame" )
     return( output )
 }
-
-##' Output of the \code{\link{vasp.import}} function applied on the CHGCAR file of a single silicium atom in a fcc cell.
-##'
-##' @format Data frame containing four columns
-##' \itemize{
-##'   \item{ charge: Consists of four columns: "x", "y", "z" containing the Cartesian coordinates to a grid point and "charge" containing the charge density on this specific grid point.}
-##'   \item{ atoms: Consists of four columns: "x", "y", "z" containing the Cartesian coordinates to the atoms within the cell and "type" providing a factor to distinguish the individual types of atoms.}
-##'   \item{ lattice:  Consists of three columns: "x", "y", "z" containing the components of the three lattice vectors of the unit cell.}
-##' }
-##'
-##' @name SiChgcar
-NULL
