@@ -25,8 +25,7 @@ Philipp Mueller
 }
 \seealso{
 Other vasp: \code{\link{vasp.bonds}},
-  \code{\link{vasp.diff}}, \code{\link{vasp.plane}},
-  \code{\link{vasp.reproduce}},
+  \code{\link{vasp.diff}}, \code{\link{vasp.reproduce}},
   \code{\link{vasp.rotate.cell}}
 }
 

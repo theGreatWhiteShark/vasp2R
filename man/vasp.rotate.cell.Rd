@@ -27,6 +27,6 @@ Philipp Mueller
 
 Other vasp: \code{\link{vasp.bonds}},
   \code{\link{vasp.diff}}, \code{\link{vasp.import}},
-  \code{\link{vasp.plane}}, \code{\link{vasp.reproduce}}
+  \code{\link{vasp.reproduce}}
 }
 

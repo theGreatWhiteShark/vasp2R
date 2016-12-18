@@ -30,6 +30,6 @@ Philipp Mueller
 \seealso{
 Other vasp: \code{\link{vasp.bonds}},
   \code{\link{vasp.diff}}, \code{\link{vasp.import}},
-  \code{\link{vasp.plane}}, \code{\link{vasp.rotate.cell}}
+  \code{\link{vasp.rotate.cell}}
 }
 
