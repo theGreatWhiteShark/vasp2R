@@ -217,26 +217,3 @@ vasp.diff <- function( x, y ){
     class( output ) <- "vasp"
     return( output )
 }
-
-##' @title Extracts a plane of charge orthogonal to the z axis.
-##'
-##' @details Only the charge density is sliced.
-##'
-##' @param x Object result of class "vasp".
-##' @param height Position on the z axis at which the slice through the charge density is going to be performed. The default value is the mean z value of all atoms of the first type listed in x$atoms$type (since the package was originally intended for layered materials).
-##'
-##' @family vasp
-##' @export
-##'
-##' @return Object of class vasp containing just one z plane in its $charge element.
-##' @author Philipp Mueller
-vasp.plane <- function( x, height = mean( x$atoms[ x$atoms$type == unique( x$atoms$type )[ 1 ], ]$z ) ){
-    ## Plotting the electron density at the z grid nearest to the Graphene layer.
-    ## Where x is the latter one and y is the reference
-    plot.height <- which( abs( unique( x$charge$z ) - height ) == 
-                             min( abs( unique( x$charge$z ) - height ) ) )
-    plot.data.diff <-  x$charge[ x$charge[ "z" ] == unique( x$charge$z )[ plot.height ], ]
-    output <- list( charge = plot.data.diff, atoms = x$atoms )
-    class( output ) <- "vasp"
-    return( output )
-}
