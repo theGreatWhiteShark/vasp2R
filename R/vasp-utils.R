@@ -68,14 +68,13 @@ vasp.bonds.default <- function( x, distance ){
         stop( "vasp.bonds: A data frame containing named columns 'x', 'y' and 'z' has to be provided in bonds." )
     if ( length( unique( x$type ) ) != length( distance ) )
         stop( "vasp.bonds: The number of bonding distance thresholds in bonds has to be of the same length than the number of types in the supplied data frame." )
-
-    bond <- data.frame( x.begin = rep( -999, nrow( x )* 5 ),
-                       y.begin = rep( -999, nrow( x )* 5 ),
-                       z.begin = rep( -999, nrow( x )* 5 ),
-                       x.end = rep( -999, nrow( x )* 5 ),
-                       y.end = rep( -999, nrow( x )* 5 ),
-                       z.end = rep( -999, nrow( x )* 5 ),
-                       type = rep( "bla", nrow( x )* 5 ),
+    bond <- data.frame( x.begin = rep( -999, nrow( x )* 10 ),
+                       y.begin = rep( -999, nrow( x )* 10 ),
+                       z.begin = rep( -999, nrow( x )* 10 ),
+                       x.end = rep( -999, nrow( x )* 10 ),
+                       y.end = rep( -999, nrow( x )* 10 ),
+                       z.end = rep( -999, nrow( x )* 10 ),
+                       type = rep( "bla", nrow( x )* 10 ),
                        stringsAsFactors = FALSE )
     bond.count <- 1
     bond.type.count <- 0
