@@ -1,6 +1,6 @@
 # About
 
-For information about the basic usage refer to the package's vignette.
+For information about the basic usage please refer to this [blog post](https://thegreatwhiteshark.tech.blog/2016/12/18/vasp2r/) or the package's vignette.
 
 This package was the result of my endeavor to generate some neat plots of a variety of calculations using the DFT software VASP. Since it's charge density file are quite large it is essential to implement some functions for importing and modification in plain C++ and call them from a high level language (like R) to ensure responsiveness of the code. So since I already wrote those functions, why shouldn't I share it?
 
