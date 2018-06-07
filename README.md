@@ -1,3 +1,7 @@
+I'm leaving this sinking ship. If you like this project, checked out the maintained version on [GitLab.com](https://gitlab.com/theGreatWhiteShark/vasp2R).
+
+---
+
 # About
 
 For information about the basic usage please refer to this [blog post](https://thegreatwhiteshark.tech.blog/2016/12/18/vasp2r/) or the package's vignette.
